@@ -39,10 +39,12 @@ implementation resolves them:
   dispute/resolve/chargeback are defined purely as arithmetic on
   available/held/total against whatever `tx` is referenced, so the
   engine applies the same formula uniformly rather than special-casing
-  by kind. In practice this means a chargeback always drains `held`
-  without crediting `available` — for a disputed deposit that correctly
-  discards the fraudulent funds, but for a disputed withdrawal it does
-  not credit the client's withdrawn amount back.
+  by kind. For a disputed deposit this is correct. For a disputed
+  withdrawal it's asymmetric in two ways: at dispute time, `available`
+  is debited a second time (once by the withdrawal, once by the
+  dispute), which can drive it negative; and at chargeback time, `held`
+  is drained without crediting `available` back, so the client never
+  recovers the withdrawn amount.
 - **A dispute/resolve/chargeback is checked against the client of the
   `tx` it references** — a reference to another client's transaction is
   treated as unknown (ignored), as a basic guard against one client
